@@ -1,0 +1,21 @@
+FROM ubuntu:18.04
+
+ENV KAFKA_HOME /usr/local/kafka
+
+# install java 8
+RUN apt-get update && \
+    apt-get install -y openjdk-8-jdk wget
+
+# install kafka
+RUN wget https://dlcdn.apache.org/kafka/3.6.0/kafka_2.13-3.6.0.tgz && \
+    tar -xzf kafka_2.13-3.6.0.tgz && \
+    mv kafka_2.13-3.6.0 $KAFKA_HOME
+
+RUN touch $KAFKA_HOME/start-kafka.sh && \
+    echo "cd $KAFKA_HOME"  > $KAFKA_HOME/start-kafka.sh && \
+    echo "bin/zookeeper-server-start.sh config/zookeeper.properties &" >> $KAFKA_HOME/start-kafka.sh && \
+    echo "bin/kafka-server-start.sh config/server.properties &" >> $KAFKA_HOME/start-kafka.sh && \
+    chmod +x $KAFKA_HOME/start-kafka.sh
+
+EXPOSE 9092
+CMD $KAFKA_HOME/start-kafka.sh
